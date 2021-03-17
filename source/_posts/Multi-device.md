@@ -2,7 +2,7 @@
 title: I move my hexo to another computer!
 date: 
 comments: true
-categories: Life
+categories: Hexo
 ---
 
 # Record Life.
@@ -15,20 +15,20 @@ categories: Life
 
 一样的，跟之前的环境搭建一样，
 
-- 安装git
+- ## 安装git
 
 ```text
 sudo apt-get install git
 ```
 
-- 设置git全局邮箱和用户名
+- ## 设置git全局邮箱和用户名
 
 ```text
 git config --global user.name "yourgithubname"
 git config --global user.email "yourgithubemail"
 ```
 
-- 设置ssh key
+- ## 设置ssh key
 
 ```text
 ssh-keygen -t rsa -C "youremail"
@@ -38,14 +38,14 @@ ssh -T git@github.com
 ssh -T git@git.coding.net #(有coding平台的话)
 ```
 
-- 安装nodejs
+- ## 安装nodejs
 
 ```text
 sudo apt-get install nodejs
 sudo apt-get install npm
 ```
 
-- 安装hexo  
+- ## 安装hexo  
 
 ```text
 sudo npm install hexo-cli -g
@@ -76,7 +76,7 @@ hexo d
 
 
 
-然后就可以开始写你的新博客了
+## Tips: 然后就可以开始写你的新博客了
 
 ```text
 hexo new newpage
