@@ -5,9 +5,4 @@ type: "categories"
 ---
 
 - Life
-
 - Hexo
-
-  ---
-
-  
