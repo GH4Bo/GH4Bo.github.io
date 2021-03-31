@@ -6,3 +6,5 @@ type: "categories"
 
 - Life
 - Hexo
+- Machine Learning
+
