@@ -59,7 +59,7 @@ footer:
     # Icon name in Font Awesome. See: https://fontawesome.com/icons
     name: fa fa-heart
     # If you want to animate the icon, set it to true.
-    animated: false
+    animated: true
     # Change the color of icon, using Hex Code.
     color: "#ff0000"
 
@@ -117,8 +117,8 @@ darkmode: true
 # External url should start with http:// or https://
 menu:
   home: / || fa fa-home
-  #tags: /tags/ || fa fa-tags
   categories: /categories/ || fa fa-th
+  tags: /tags/ || fa fa-tags
   archives: /archives/ || fa fa-archive
   about: /about/ || fa fa-user
   #schedule: /schedule/ || fa fa-calendar
@@ -251,9 +251,9 @@ post_meta:
 # Post wordcount display settings
 # Dependencies: https://github.com/theme-next/hexo-symbols-count-time
 symbols_count_time:
-  separated_meta: true
+  separated_meta: false
   item_text_post: true
-  item_text_total: true
+  item_text_total: false
   awl: 4
   wpm: 275
 
@@ -412,7 +412,7 @@ github_banner:
 # ---------------------------------------------------------------
 
 font:
-  enable: false
+  enable: true
 
   # Uri of fonts host, e.g. https://fonts.googleapis.com (Default).
   host:
@@ -431,24 +431,24 @@ font:
   # Font settings for site title (.site-title).
   title:
     external: true
-    family:
+    family: Press Start 2P
     size:
 
   # Font settings for headlines (<h1> to <h6>).
   headings:
     external: true
-    family:
-    size:
+    family: Noto Serif SC
+    size: 
 
   # Font settings for posts (.post-body).
   posts:
     external: true
-    family:
+    family: Noto Serif SC
 
   # Font settings for <code> and code blocks.
   codes:
     external: true
-    family:
+    family: ZCOOL XiaoWei
 
 
 # ---------------------------------------------------------------
@@ -617,11 +617,11 @@ valine:
   enable: true
   appid: xvPpIC0fTJw0SCzjTX3RDtjT-gzGzoHsz # Your leancloud application appid
   appkey: GcGmxlL5sRKzOL7wPQUDeCcm # Your leancloud application appkey
-  notify: false # Mail notifier
+  notify: true # Mail notifier
   verify: false # Verification code
   placeholder: 请多多指教。。。 # Comment box placeholder
-  avatar: mm # Gravatar style
-  guest_info: nick # Custom comment header
+  avatar: monsterid # Gravatar style
+  guest_info: nick,mail,link # Custom comment header		nick,mail,link
   pageSize: 10 # Pagination size
   language: zh-cn # Language, available values: en, zh-cn
   visitor: true # Article reading statistic
@@ -629,6 +629,7 @@ valine:
   recordIP: false # Whether to record the commenter IP
   serverURLs: # When the custom domain name is enabled, fill it in here (it will be detected automatically by default, no need to fill in)
   #post_meta_order: 0
+
 
 # LiveRe comments system
 # You can get your uid from https://livere.com/insight/myCode (General web site)
@@ -866,7 +867,7 @@ three:
 # Dependencies: https://github.com/theme-next/theme-next-canvas-ribbon
 # For more information: https://github.com/zproo/canvas-ribbon
 canvas_ribbon:
-  enable: true
+  enable: false
   size: 300 # The width of the ribbon
   alpha: 0.6 # The transparency of the ribbon
   zIndex: -1 # The display level of the ribbon

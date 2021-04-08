@@ -40,7 +40,7 @@ external_link:	#在新标签中打开链接
   exclude: ''
 filename_case: 0	#将文件名称转换为大小写
 render_drafts: false	#显示草稿
-post_asset_folder: false	#启动asset文件夹
+post_asset_folder: true	#启动asset文件夹
 relative_link: false	#把链接改为根目录的相对位置
 future: true	#显示未来的文章
 highlight:	#代码块的设置
@@ -109,8 +109,8 @@ deploy:
 symbols_count_time:	#添加字数统计与阅读时长
   symbols: true
   time: true
-  total_symbols: true
-  total_time: true
+  total_symbols: false
+  total_time: false
 
 # Hexo plugin: hexo-helper-live2d
 ## https://github.com/EYHN/hexo-helper-live2d
