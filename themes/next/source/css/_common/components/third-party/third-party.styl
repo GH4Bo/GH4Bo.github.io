@@ -5,3 +5,65 @@
 @import 'related-posts' if (hexo-config('related_posts.enable'));
 
 @import 'math' if (hexo-config('math.mathjax.enable'));
+
+//以下是comment框css
+
+#veditor {
+	border: 2px solid #eae4e4;
+	background-image: url(https://image.bestzuo.cn/images/20200708160947.gif!getwebp);
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: right;
+	background-color: #F4F4F4;
+	border-radius: 10px;
+	resize: vertical
+}
+
+#veditor:focus{
+	background-position-y: 200px;
+	transition: all 0.2s ease-in-out 0s;
+}
+
+.v .vwrap{
+    //background: #eaeaef;
+    border: 2px solid #000000;
+    border-radius: 10px;
+}
+.v .vwrap .vheader .vinput.vnick {
+	width: 33%;
+	float: left;
+	background: #F4F4F4;
+    border: 2px solid #eae4e4;
+    border-radius: 10px;
+}
+.v .vwrap .vheader .vinput.vmail {
+	width: 33%;
+	float: center;
+	background: #F4F4F4;
+    border: 2px solid #eae4e4;
+    border-radius: 10px;
+}
+.v .vwrap .vheader .vinput.vlink {
+	width: 33%;
+	float: right;
+	background: #F4F4F4;
+   	border: 2px solid #eae4e4;
+	border-radius: 10px;
+	//margin-top: 15px;
+}
+.v .veditor {
+	width: 100%;
+    min-height: 7rem;
+    font-size: 0.875rem;
+    background: transparent;
+    resize: none;
+    transition: all 0.25s ease;
+    color: #707680;
+    border: 0;
+    border-radius: .22rem;
+    background-color: #f4f5f9;
+}
+
+#vbtn {
+    border: 1px solid #0e0c0c;
+}
