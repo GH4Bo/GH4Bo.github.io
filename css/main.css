@@ -1261,7 +1261,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #9ec821;
+  background: #3405d4;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2235,6 +2235,60 @@ mjx-container[jax="CHTML"][display="true"],
 mjx-container + br {
   display: none;
 }
+#veditor {
+  border: 2px solid #eae4e4;
+  background-image: url("https://image.bestzuo.cn/images/20200708160947.gif!getwebp");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: right;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  resize: vertical;
+}
+#veditor:focus {
+  background-position-y: 200px;
+  transition: all 0.2s ease-in-out 0s;
+}
+.v .vwrap {
+  border: 2px solid #000;
+  border-radius: 10px;
+}
+.v .vwrap .vheader .vinput.vnick {
+  width: 33%;
+  float: left;
+  background: #f4f4f4;
+  border: 2px solid #eae4e4;
+  border-radius: 10px;
+}
+.v .vwrap .vheader .vinput.vmail {
+  width: 33%;
+  float: center;
+  background: #f4f4f4;
+  border: 2px solid #eae4e4;
+  border-radius: 10px;
+}
+.v .vwrap .vheader .vinput.vlink {
+  width: 33%;
+  float: right;
+  background: #f4f4f4;
+  border: 2px solid #eae4e4;
+  border-radius: 10px;
+}
+.v .veditor {
+  width: 100%;
+  min-height: 7rem;
+  font-size: 0.875rem;
+  background: transparent;
+  resize: none;
+  transition: all 0.25s ease;
+  color: #707680;
+  border: 0;
+  border-radius: 0.22rem;
+  background-color: #f4f5f9;
+}
+#vbtn {
+  border: 1px solid #0e0c0c;
+}
 .header {
   margin: 0 auto;
   position: relative;
@@ -2289,12 +2343,13 @@ mjx-container + br {
 }
 .content-wrap {
   background: var(--content-bg-color);
+  background: rgba(255,255,255,0.5);
   border-radius: initial;
   box-shadow: initial;
   box-sizing: border-box;
   padding: 40px;
   width: calc(100% - 252px);
-  opacity: 0.9;
+  opacity: 0.95;
 }
 @media (max-width: 991px) {
   .content-wrap {
@@ -2320,7 +2375,7 @@ mjx-container + br {
   }
 }
 .site-brand-container {
-  background: #222;
+  background: #eaeaef;
 }
 @media (max-width: 991px) {
   .site-brand-container {
@@ -2527,7 +2582,7 @@ mjx-container + br {
   margin-top: 16px;
 }
 body {
-  background: url("/images/bg.png");
+  background: #fde6e0;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: 50% 50%;
