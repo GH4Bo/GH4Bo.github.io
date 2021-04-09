@@ -1261,7 +1261,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #2eff9c;
+  background: #9ec821;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2528,10 +2528,13 @@ mjx-container + br {
 }
 body {
   background: url("/images/bg.png");
-  background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  background-position: center;
+  background-position: 50% 50%;
+  color: var(--text-color);
+  font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1em;
+  line-height: 2;
 }
 .header-inner {
   border-radius: 20px 20px 20px 20px;
