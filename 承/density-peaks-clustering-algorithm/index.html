@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Press Start 2P:300,300italic,400,400italic,700,700italic|Noto Serif SC:300,300italic,400,400italic,700,700italic|ZCOOL XiaoWei:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-minimal.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"gh4bo.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="处理数据时学习了一种新的聚类方法–密度峰值聚类。记录一下学习过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="density_peaks_clustering_algorithm">
+<meta property="og:url" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/index.html">
+<meta property="og:site_name" content="Bo">
+<meta property="og:description" content="处理数据时学习了一种新的聚类方法–密度峰值聚类。记录一下学习过程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/gif.latex">
+<meta property="og:image" content="http://latex.codecogs.com/gif.latex?%5Crho&space;_i">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102104453414-2010057691.gif">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/gif.latex">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102104556798-1006163741.gif">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/gif.latex">
+<meta property="og:image" content="http://latex.codecogs.com/gif.latex?d_c">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102104640068-1363280275.png">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102104747762-831784251.gif">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102105153899-408417312.png">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/image-20210511222630043.png">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/image-20210511222639063.png">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/20171205105253881">
+<meta property="article:published_time" content="2021-04-24T02:58:39.000Z">
+<meta property="article:modified_time" content="2021-05-11T14:36:11.292Z">
+<meta property="article:author" content="Bo">
+<meta property="article:tag" content="Density Peaks Clustering">
+<meta property="article:tag" content="Algorithm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/gif.latex">
+
+<link rel="canonical" href="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>density_peaks_clustering_algorithm | Bo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Bo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">14</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">14</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/GH4Bo" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://gh4bo.github.io/%E6%89%BF/density-peaks-clustering-algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Bo">
+      <meta itemprop="description" content="I can do all things through Christ who strengthens me!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          density_peaks_clustering_algorithm
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-24 10:58:39" itemprop="dateCreated datePublished" datetime="2021-04-24T10:58:39+08:00">2021-04-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-11 22:36:11" itemprop="dateModified" datetime="2021-05-11T22:36:11+08:00">2021-05-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%89%BF/" itemprop="url" rel="index"><span itemprop="name">承</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E6%89%BF/density-peaks-clustering-algorithm/" class="post-meta-item leancloud_visitors" data-flag-title="density_peaks_clustering_algorithm" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E6%89%BF/density-peaks-clustering-algorithm/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E6%89%BF/density-peaks-clustering-algorithm/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p> 处理数据时学习了一种新的聚类方法–密度峰值聚类。记录一下学习过程。</p>
+<span id="more"></span>
+
+<p>密度峰值聚类说白了就是4步：</p>
+<p>第1步，求每个点的密度rho。点的密度就是，以点为中心，以dc为半径，画一个小圆圈，数数里面几个点，圆圈中点的个数就是点的密度。（还可以用高斯核密度求点的密度，求出来的密度是连续型的）</p>
+<p>第2步，计算每个点的delta。假设有一个点x，求比点x的密度大的且距离点x最近的那个点y，那么点x与点y之间的距离，就是点x的delta，就这样遍历所有点，把每个点的delta都求出来（注意，delta是距离，谁和谁的距离？x和y的距离，y是谁？y就是比x密度大，且距离x最近的那个点，要满足两个条件，密度比x大且距离最近）</p>
+<p>第3步，每个点的密度rho和delta都求出来了，以rho为横坐标，delta为纵坐标，画个二维图，图中右上角的那几个点就是聚类中心，也就是rho和delta都很大的那几个点。（为什么？因为聚类中心有个特点，密度很大，且与密度比它大的点的距离也很大）</p>
+<p>第4步，找到聚类中心了，就可以扩展聚类簇了，按照rho从大到小的顺序进行聚类扩展。</p>
+<p>就是这么简单！这个算法有很多缺点，比如不适合高维，第1步中的半径dc难以选择，效率太低等等，因此成百上千篇的论文都在优化这个算法。</p>
+<h1 id="1、背景介绍"><a href="#1、背景介绍" class="headerlink" title="1、背景介绍"></a>1、背景介绍</h1><p>　　密度峰值算法（Clustering by fast search and find of density peaks）由Alex Rodriguez和Alessandro Laio于2014年提出，并将论文发表在Science上。Science上的这篇文章《Clustering by fast search and find of density peaks》主要讲的是一种基于密度的聚类方法，基于密度的聚类方法的主要思想是寻找被低密度区域分离的高密度区域。 密度峰值算法(DPCA)基于这样的假设：（1）<strong>类簇中心点的密度大于周围邻居点的密度</strong>；（2）<strong>类簇中心点与更高密度点之间的距离相对较大</strong>。因此，DPCA主要有两个需要计算的量：第一，局部密度；第二，与高密度点之间的距离。</p>
+<h1 id="2、局部密度"><a href="#2、局部密度" class="headerlink" title="2、局部密度"></a>2、局部密度</h1><p>　　数据对象<img src="/%E6%89%BF/density-peaks-clustering-algorithm/gif.latex" alt="x{_{i}}">的局部密度<img src="http://latex.codecogs.com/gif.latex?%5Crho&space;_i" alt="img">定义为：<img src="/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102104453414-2010057691.gif" alt="img"></p>
+<p>其中，<img src="/%E6%89%BF/density-peaks-clustering-algorithm/gif.latex" alt="dist_{cutoff}">表示截断距离<img src="/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102104556798-1006163741.gif" alt="img">，这个公式的含义是说找到与第<img src="/%E6%89%BF/density-peaks-clustering-algorithm/gif.latex" alt="img">个数据点之间的距离小于截断距离<img src="http://latex.codecogs.com/gif.latex?d_c" alt="img">的数据点的个数，并将其作为第i个数据点真的密度。</p>
+<p><img src="/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102104640068-1363280275.png" alt="img"></p>
+<h1 id="3、定义聚类中心距离"><a href="#3、定义聚类中心距离" class="headerlink" title="3、定义聚类中心距离"></a>3、定义聚类中心距离</h1><p>　　密度峰聚类算法的巧妙之处：就是在于聚类中心距离 δi的选定。根据局部密度的定义，我们可以计算出上图中每个点的密度，依照密度确定聚类中心距离 δi。</p>
+<ol>
+<li><p>首先将每个点的密度从大到小排列： ρi &gt; ρj &gt; ρk &gt; ….；密度最大的点的聚类中心距离与其他点的聚类中心距离的确定方法是不一样的;</p>
+</li>
+<li><p>先确定密度最大的点的聚类中心距离–i点是密度最大的点，它的聚类中心距离δiδi等于与i点最远的那个点n到点i的直线距离 d(i,n)；</p>
+</li>
+<li><p>再确定其他点的聚类中心距离——其他点的聚类中心距离是等于在密度大于该点的点集合中，与该点距离最小的的那个距离。例如i、j、k的密度都比n点的密度大，且j点离n点最近，则n点的聚类中心距离等于d(j,n); </p>
+</li>
+<li><p>依次确定所有的聚类中心距离δ<br><img src="/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102104747762-831784251.gif" alt="img"></p>
+</li>
+</ol>
+<h1 id="4、聚类效果"><a href="#4、聚类效果" class="headerlink" title="4、聚类效果"></a>4、聚类效果</h1><p>　　将所有点的聚类中心密度都统计出来后，将其值按 δi和pi作为坐标轴作图可以得到如图所示结果。可以看到图中1,10两个聚类中心同时远离坐标轴。普通点则是靠近p轴，异常点靠近 δ轴。</p>
+<p><img src="/%E6%89%BF/density-peaks-clustering-algorithm/1220845-20181102105153899-408417312.png" alt="img"></p>
+<h1 id="5、代码"><a href="#5、代码" class="headerlink" title="5、代码"></a>5、代码</h1><p>​        根据以上方法试着写出代码</p>
+<h2 id="1、计算距离矩阵"><a href="#1、计算距离矩阵" class="headerlink" title="1、计算距离矩阵"></a>1、计算距离矩阵</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算距离矩阵</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cal_dis</span>(<span class="params">data</span>):</span></span><br><span class="line">    distance_all = np.random.rand(<span class="built_in">len</span>(data), <span class="built_in">len</span>(data))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(data)):</span><br><span class="line">        <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(data)):</span><br><span class="line">            distance_all[i][n] = np.sqrt(np.square(<span class="built_in">abs</span>(data[i][<span class="number">0</span>]) - <span class="built_in">abs</span>(data[n][<span class="number">0</span>])) +</span><br><span class="line">                                         np.square(<span class="built_in">abs</span>(data[i][<span class="number">1</span>]) - <span class="built_in">abs</span>(data[n][<span class="number">1</span>])) +</span><br><span class="line">                                         np.square(data[i][<span class="number">2</span>] - data[n][<span class="number">2</span>]))</span><br><span class="line">            <span class="comment"># np.square(data[i][3]-data[n][3])+</span></span><br><span class="line">            <span class="comment"># np.square(data[i][4]-data[n][4])+</span></span><br><span class="line">            <span class="comment"># np.square(data[i][5]-data[n][5])+</span></span><br><span class="line">            <span class="comment"># np.square(data[i][6]-data[n][6])+</span></span><br><span class="line">            <span class="comment"># np.square(data[i][7]-data[n][7]))</span></span><br><span class="line">    <span class="comment"># print(&#x27;距离矩阵：\n&#x27;, distance_all, &#x27;\n&#x27;)</span></span><br><span class="line">    <span class="keyword">return</span> distance_all</span><br></pre></td></tr></table></figure>
+
+<p>根据数据的个数，建立n*n阶矩阵，在这里距离值是数据内各维度数据之差的平方，维度越高可能精度越不准确，还有很多论文提出有关高维的密度峰值聚类方法，可以加以参考，这里就用了三个维度主要数据。</p>
+<h2 id="2、计算密度数组"><a href="#2、计算密度数组" class="headerlink" title="2、计算密度数组"></a>2、计算密度数组</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cal_den</span>(<span class="params">distance_all, min_distance</span>):</span></span><br><span class="line">    point_density = np.random.rand(distance_all.shape[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">        tmp = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">            <span class="keyword">if</span> <span class="number">0</span> &lt; distance_all[i][n] &lt; min_distance:</span><br><span class="line">                tmp = tmp + <span class="number">1</span></span><br><span class="line">        point_density[i] = tmp</span><br><span class="line">    <span class="comment"># print(&#x27;点密度数组：\n&#x27;, point_density, &#x27;\n&#x27;)</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> point_density</span><br></pre></td></tr></table></figure>
+
+<p>计算密度数组需要输入两个参数，距离矩阵和最小距离，这里的最小距离是以这个点为中心，以多长距离为半径画圆，在这个范围内的数据的个数就是这个中心点的密度。我参考的一个最小距离的值是在距离矩阵内最大值和最小值的平均值。</p>
+<h2 id="3、计算密度最大的点的聚类中心距离"><a href="#3、计算密度最大的点的聚类中心距离" class="headerlink" title="3、计算密度最大的点的聚类中心距离"></a>3、计算密度最大的点的聚类中心距离</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算密度最大的点的聚类中心距离</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_max_dis</span>(<span class="params">distance_all, point_density</span>):</span></span><br><span class="line">    point_density = point_density.tolist()</span><br><span class="line">    a = <span class="built_in">max</span>(point_density)  <span class="comment"># 寻找密度最大的点</span></span><br><span class="line">    b = point_density.index(a)  <span class="comment"># 寻找密度最大的索引</span></span><br><span class="line">    c = <span class="built_in">max</span>(distance_all[b])  <span class="comment"># 密度最大点的最大中心距离</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> c</span><br></pre></td></tr></table></figure>
+
+<p>之前说先确定密度最大的点的最大中心距离，因为这个点没有比它密度还要大的点，所以将这个点另行计算。</p>
+<h2 id="4、到点密度大于自身最近点的距离"><a href="#4、到点密度大于自身最近点的距离" class="headerlink" title="4、到点密度大于自身最近点的距离"></a>4、到点密度大于自身最近点的距离</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 到点密度大于自身最近点的距离</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_min_dis</span>(<span class="params">point, i, distance_all, point_density</span>):</span></span><br><span class="line">    min_distance = []</span><br><span class="line">    <span class="keyword">if</span> point:</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> point:</span><br><span class="line">            min_distance.append(distance_all[i][j])</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">min</span>(min_distance)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        max_distance = get_max_dis(distance_all, point_density)</span><br><span class="line">        <span class="keyword">return</span> max_distance</span><br></pre></td></tr></table></figure>
+
+<p>point参数来自下方的传参，就是一个列表，列表中存着密度比第i个点大的点的数据。如果point是个空列表，说明这个点是密度最大点，所以用get_max_dis方法返回这个点的聚类中心距离。</p>
+<h2 id="5、计算各点到聚类中心的距离"><a href="#5、计算各点到聚类中心的距离" class="headerlink" title="5、计算各点到聚类中心的距离"></a>5、计算各点到聚类中心的距离</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算各点到聚类中心的距离(dist)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_each_dis</span>(<span class="params">distance_all, point_density</span>):</span></span><br><span class="line">    nn = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(point_density)):</span><br><span class="line">        aa = []</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(point_density)):</span><br><span class="line">            <span class="keyword">if</span> point_density[i] &lt; point_density[j]:</span><br><span class="line">                aa.append(j)</span><br><span class="line">        ll = get_min_dis(aa, i, distance_all, point_density)</span><br><span class="line">        nn.append(ll)</span><br><span class="line">    <span class="keyword">return</span> nn</span><br></pre></td></tr></table></figure>
+
+<p>这里就是根据密度数组，找出每一个数据密度比自身大的点，把这些点加入到一个列表中，这里aa就是存放比自己密度大点的列表，如果自身是密度最大点，那么传到get_min_dis中的aa就是一个空的列表，最后将每个点到聚类中心的距离返回。</p>
+<h2 id="6、根据特征分类"><a href="#6、根据特征分类" class="headerlink" title="6、根据特征分类"></a>6、根据特征分类</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 分簇，根据需要划分的特征结果数找到数据密度中最大的n个点</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">clustering</span>(<span class="params">point_density, delta</span>):</span></span><br><span class="line">    mul1 = (point_density * delta).tolist()</span><br><span class="line">    mul2 = mul1.copy()</span><br><span class="line">    mul2.sort(reverse=<span class="literal">True</span>)</span><br><span class="line">    v = np.random.rand(feature_num)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(feature_num):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(mul1)):</span><br><span class="line">            <span class="keyword">if</span> mul1[j] == mul2[i]:</span><br><span class="line">                v[i] = mul1.index(mul1[j])</span><br><span class="line">    <span class="keyword">return</span> v</span><br></pre></td></tr></table></figure>
+
+<p>寻找最大的feature_num个密度中心点，寻找的方法是$\rho$和$\delta$的乘积，$\rho$越大，说明这个点周围的点越多，$\delta$越大，说明这个点离比它密度大的点距离越远，所以根据两者乘积，就可以基本上得到几个分类中心，我这里将数据分为了四类，也就是feature_num=4</p>
+<h2 id="7、输出每个点的分类"><a href="#7、输出每个点的分类" class="headerlink" title="7、输出每个点的分类"></a>7、输出每个点的分类</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 归类，判断所有点与V中点的距离，距离最近的划为一类，输出每个数据的类别</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">classify</span>(<span class="params">distance_all, v</span>):</span></span><br><span class="line">    c = np.random.rand(distance_all.shape[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">        dist = []</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(v)):</span><br><span class="line">            dist.append(distance_all[i][<span class="built_in">int</span>(v[j])])</span><br><span class="line">        c[i] = dist.index(<span class="built_in">min</span>(dist)) + <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> c</span><br></pre></td></tr></table></figure>
+
+<p>由上面得到了分出来的四类中心点，这块代码就是将除了这四个中心点外的其他点，判断它们离哪一个中心点更近，将它与离其最近的中心点划为一类。</p>
+<h2 id="8、计算最大最小距离"><a href="#8、计算最大最小距离" class="headerlink" title="8、计算最大最小距离"></a>8、计算最大最小距离</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算最大最小距离</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">max_min_dis</span>(<span class="params">distance_all</span>):</span></span><br><span class="line">    max_dis = <span class="number">0</span></span><br><span class="line">    min_dis = <span class="number">999</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">            <span class="keyword">if</span> distance_all[i][j] == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="keyword">if</span> distance_all[i][j] &gt; max_dis:</span><br><span class="line">                max_dis = distance_all[i][j]</span><br><span class="line">            <span class="keyword">if</span> distance_all[i][j] &lt; min_dis:</span><br><span class="line">                min_dis = distance_all[i][j]</span><br><span class="line">    <span class="keyword">return</span> max_dis, min_dis</span><br></pre></td></tr></table></figure>
+
+<p>这里的代码可有可无，就是计算距离矩阵中距离的最大差，方便计算第二步中的密度数组。</p>
+<h2 id="源代码"><a href="#源代码" class="headerlink" title="源代码"></a>源代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">feature_num = <span class="number">4</span>     <span class="comment"># 根据特征分成四组</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 读取文件将数据存到一个列表</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read_file</span>(<span class="params">file_name</span>):</span></span><br><span class="line">    file = <span class="built_in">open</span>(file_name, <span class="string">&#x27;r&#x27;</span>)</span><br><span class="line">    array = []</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> file:</span><br><span class="line">        array.append([<span class="built_in">int</span>(x) <span class="keyword">for</span> x <span class="keyword">in</span> line.split()])  <span class="comment"># int将字符串转换成整型，方便后续计算</span></span><br><span class="line">    file.close()</span><br><span class="line">    <span class="keyword">return</span> array</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将距离矩阵归一化  可以直接遍历除以行最大值，我这里的方法有点画蛇添足</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">norm</span>(<span class="params">data</span>):</span></span><br><span class="line">    data = np.array(data).astype(<span class="built_in">float</span>)</span><br><span class="line">    max_array = np.zeros(data.shape[<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(data.shape[<span class="number">0</span>]):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(data.shape[<span class="number">1</span>]):</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">abs</span>(data[i][j]) &gt; max_array[j]:</span><br><span class="line">                max_array[j] = <span class="built_in">abs</span>(data[i][j])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(data.shape[<span class="number">0</span>]):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(data.shape[<span class="number">1</span>]):</span><br><span class="line">            data[i][j] = data[i][j] / max_array[j]</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算距离矩阵和密度数组</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cal_dis</span>(<span class="params">data</span>):</span></span><br><span class="line">    distance_all = np.random.rand(<span class="built_in">len</span>(data), <span class="built_in">len</span>(data))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(data)):</span><br><span class="line">        <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(data)):</span><br><span class="line">            distance_all[i][n] = np.sqrt(np.square(<span class="built_in">abs</span>(data[i][<span class="number">0</span>]) - <span class="built_in">abs</span>(data[n][<span class="number">0</span>])) +</span><br><span class="line">                                         np.square(<span class="built_in">abs</span>(data[i][<span class="number">1</span>]) - <span class="built_in">abs</span>(data[n][<span class="number">1</span>])) +</span><br><span class="line">                                         np.square(data[i][<span class="number">2</span>] - data[n][<span class="number">2</span>]))</span><br><span class="line">            <span class="comment"># np.square(data[i][3]-data[n][3])+</span></span><br><span class="line">            <span class="comment"># np.square(data[i][4]-data[n][4])+</span></span><br><span class="line">            <span class="comment"># np.square(data[i][5]-data[n][5])+</span></span><br><span class="line">            <span class="comment"># np.square(data[i][6]-data[n][6])+</span></span><br><span class="line">            <span class="comment"># np.square(data[i][7]-data[n][7]))</span></span><br><span class="line">    <span class="comment"># print(&#x27;距离矩阵：\n&#x27;, distance_all, &#x27;\n&#x27;)</span></span><br><span class="line">    <span class="keyword">return</span> distance_all</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cal_den</span>(<span class="params">distance_all, min_distance</span>):</span></span><br><span class="line">    point_density = np.random.rand(distance_all.shape[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">        tmp = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">            <span class="keyword">if</span> <span class="number">0</span> &lt; distance_all[i][n] &lt; min_distance:</span><br><span class="line">                tmp = tmp + <span class="number">1</span></span><br><span class="line">        point_density[i] = tmp</span><br><span class="line">    <span class="comment"># print(&#x27;点密度数组：\n&#x27;, point_density, &#x27;\n&#x27;)</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> point_density</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算密度最大的点的聚类中心距离</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_max_dis</span>(<span class="params">distance_all, point_density</span>):</span></span><br><span class="line">    point_density = point_density.tolist()</span><br><span class="line">    a = <span class="built_in">max</span>(point_density)  <span class="comment"># 寻找密度最大的点</span></span><br><span class="line">    b = point_density.index(a)  <span class="comment"># 寻找密度最大的索引</span></span><br><span class="line">    c = <span class="built_in">max</span>(distance_all[b])  <span class="comment"># 密度最大点的最大中心距离</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> c</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 到点密度大于自身最近点的距离</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_min_dis</span>(<span class="params">point, i, distance_all, point_density</span>):</span></span><br><span class="line">    min_distance = []</span><br><span class="line">    <span class="keyword">if</span> point:</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> point:</span><br><span class="line">            min_distance.append(distance_all[i][j])</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">min</span>(min_distance)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        max_distance = get_max_dis(distance_all, point_density)</span><br><span class="line">        <span class="keyword">return</span> max_distance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算各点到聚类中心的距离(dist)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_each_dis</span>(<span class="params">distance_all, point_density</span>):</span></span><br><span class="line">    nn = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(point_density)):</span><br><span class="line">        aa = []</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(point_density)):</span><br><span class="line">            <span class="keyword">if</span> point_density[i] &lt; point_density[j]:</span><br><span class="line">                aa.append(j)</span><br><span class="line">        ll = get_min_dis(aa, i, distance_all, point_density)</span><br><span class="line">        nn.append(ll)</span><br><span class="line">    <span class="keyword">return</span> nn</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 分簇，根据需要划分的特征结果数找到数据密度中最大的n个点</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">clustering</span>(<span class="params">point_density, delta</span>):</span></span><br><span class="line">    mul1 = (point_density * delta).tolist()</span><br><span class="line">    mul2 = mul1.copy()</span><br><span class="line">    mul2.sort(reverse=<span class="literal">True</span>)</span><br><span class="line">    v = np.random.rand(feature_num)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(feature_num):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(mul1)):</span><br><span class="line">            <span class="keyword">if</span> mul1[j] == mul2[i]:</span><br><span class="line">                v[i] = mul1.index(mul1[j])</span><br><span class="line">    <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 归类，判断所有点与V中点的距离，距离最近的划为一类，输出每个数据的类别</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">classify</span>(<span class="params">distance_all, v</span>):</span></span><br><span class="line">    c = np.random.rand(distance_all.shape[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">        dist = []</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(v)):</span><br><span class="line">            dist.append(distance_all[i][<span class="built_in">int</span>(v[j])])</span><br><span class="line">        c[i] = dist.index(<span class="built_in">min</span>(dist)) + <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> c</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算最大最小距离</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">max_min_dis</span>(<span class="params">distance_all</span>):</span></span><br><span class="line">    max_dis = <span class="number">0</span></span><br><span class="line">    min_dis = <span class="number">999</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(distance_all.shape[<span class="number">0</span>]):</span><br><span class="line">            <span class="keyword">if</span> distance_all[i][j] == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="keyword">if</span> distance_all[i][j] &gt; max_dis:</span><br><span class="line">                max_dis = distance_all[i][j]</span><br><span class="line">            <span class="keyword">if</span> distance_all[i][j] &lt; min_dis:</span><br><span class="line">                min_dis = distance_all[i][j]</span><br><span class="line">    <span class="keyword">return</span> max_dis, min_dis</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    array = read_file(<span class="string">&#x27;data.txt&#x27;</span>)</span><br><span class="line">    array = norm(array)</span><br><span class="line">    distance_all = cal_dis(array)</span><br><span class="line">    max_dis, min_dis = max_min_dis(distance_all)</span><br><span class="line">    point_density = cal_den(distance_all, <span class="number">0.5</span> * (max_dis + min_dis))</span><br><span class="line">    nn = get_each_dis(distance_all, point_density)</span><br><span class="line">    v = clustering(point_density, nn)</span><br><span class="line">    c = classify(distance_all, v)</span><br><span class="line">    print(c)</span><br><span class="line">    x = []</span><br><span class="line">    y = []</span><br><span class="line">    z = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(array)):</span><br><span class="line">        x.append(array[i][<span class="number">0</span>])</span><br><span class="line">        y.append(array[i][<span class="number">1</span>])</span><br><span class="line">        z.append(array[i][<span class="number">2</span>])</span><br><span class="line">    fig = plt.figure(<span class="number">0</span>)</span><br><span class="line">    ax = fig.add_subplot(<span class="number">111</span>, projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">    ax.scatter(x, y)</span><br><span class="line">    plt.figure(<span class="number">1</span>)</span><br><span class="line">    plt.scatter(point_density.tolist(), nn)</span><br><span class="line">    plt.figure(<span class="number">2</span>)</span><br><span class="line">    plt.scatter(<span class="built_in">range</span>(<span class="number">0</span>, <span class="number">500</span>), c.tolist())</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据集实例"><a href="#数据集实例" class="headerlink" title="数据集实例"></a>数据集实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">-<span class="number">65</span> <span class="number">96</span> <span class="number">67</span> <span class="number">15</span> <span class="number">11</span> <span class="number">73</span> <span class="number">1863</span>   <span class="number">1105</span></span><br><span class="line"><span class="number">3</span>  <span class="number">87</span> <span class="number">30</span> <span class="number">15</span> <span class="number">16</span> <span class="number">73</span> <span class="number">1830</span>   <span class="number">1535</span></span><br><span class="line">-<span class="number">64</span>    <span class="number">49</span> <span class="number">8</span>  <span class="number">15</span> <span class="number">19</span> <span class="number">73</span> <span class="number">1006</span>   <span class="number">1992</span></span><br><span class="line">-<span class="number">34</span>    <span class="number">93</span> <span class="number">12</span> <span class="number">15</span> <span class="number">12</span> <span class="number">73</span> <span class="number">1477</span>   <span class="number">1614</span></span><br><span class="line"><span class="number">9</span>  <span class="number">139</span>    <span class="number">29</span> <span class="number">15</span> <span class="number">11</span> <span class="number">73</span> <span class="number">1954</span>   <span class="number">1796</span></span><br><span class="line"><span class="number">178</span>    <span class="number">174</span>    <span class="number">40</span> <span class="number">15</span> <span class="number">18</span> <span class="number">73</span> <span class="number">1622</span>   <span class="number">1007</span></span><br><span class="line">-<span class="number">48</span>    <span class="number">160</span>    <span class="number">65</span> <span class="number">15</span> <span class="number">18</span> <span class="number">73</span> <span class="number">1508</span>   <span class="number">1198</span></span><br><span class="line"><span class="number">169</span>    <span class="number">124</span>    <span class="number">5</span>  <span class="number">15</span> <span class="number">12</span> <span class="number">73</span> <span class="number">1837</span>   <span class="number">1005</span></span><br><span class="line">-<span class="number">59</span>    -<span class="number">159</span>   <span class="number">69</span> <span class="number">15</span> <span class="number">18</span> <span class="number">73</span> <span class="number">1324</span>   <span class="number">1702</span></span><br><span class="line"><span class="number">74</span> -<span class="number">174</span>   <span class="number">17</span> <span class="number">15</span> <span class="number">12</span> <span class="number">73</span> <span class="number">1518</span>   <span class="number">1178</span></span><br><span class="line">-<span class="number">176</span>   <span class="number">177</span>    <span class="number">30</span> <span class="number">15</span> <span class="number">15</span> <span class="number">73</span> <span class="number">1647</span>   <span class="number">1909</span></span><br><span class="line"><span class="number">152</span>    -<span class="number">137</span>   <span class="number">37</span> <span class="number">15</span> <span class="number">13</span> <span class="number">73</span> <span class="number">1531</span>   <span class="number">1606</span></span><br><span class="line"><span class="number">72</span> -<span class="number">67</span>    <span class="number">74</span> <span class="number">15</span> <span class="number">10</span> <span class="number">73</span> <span class="number">1164</span>   <span class="number">1780</span></span><br><span class="line">-<span class="number">10</span>    -<span class="number">51</span>    <span class="number">17</span> <span class="number">15</span> <span class="number">16</span> <span class="number">73</span> <span class="number">1979</span>   <span class="number">1814</span></span><br><span class="line">-<span class="number">21</span>    -<span class="number">80</span>    <span class="number">69</span> <span class="number">15</span> <span class="number">14</span> <span class="number">73</span> <span class="number">1026</span>   <span class="number">1371</span></span><br><span class="line"><span class="number">111</span>    -<span class="number">83</span>    <span class="number">7</span>  <span class="number">15</span> <span class="number">10</span> <span class="number">73</span> <span class="number">1048</span>   <span class="number">1093</span></span><br><span class="line">-<span class="number">167</span>   <span class="number">57</span> <span class="number">12</span> <span class="number">15</span> <span class="number">16</span> <span class="number">73</span> <span class="number">1117</span>   <span class="number">1547</span></span><br><span class="line"><span class="number">45</span> -<span class="number">89</span>    <span class="number">55</span> <span class="number">15</span> <span class="number">14</span> <span class="number">73</span> <span class="number">1981</span>   <span class="number">1986</span></span><br><span class="line"><span class="number">83</span> -<span class="number">107</span>   <span class="number">32</span> <span class="number">15</span> <span class="number">16</span> <span class="number">73</span> <span class="number">1701</span>   <span class="number">1204</span></span><br></pre></td></tr></table></figure>
+
+<p>我这里是自己创建的数据集，就是根据数据中的某几维的不同状态判断属于那种状态，就是给大家一个参考，可以试一下。</p>
+<p><img src="/%E6%89%BF/density-peaks-clustering-algorithm/image-20210511222630043.png" alt="image-20210511222630043"></p>
+<p><img src="/%E6%89%BF/density-peaks-clustering-algorithm/image-20210511222639063.png" alt="image-20210511222639063"></p>
+<h1 id="其他技术点"><a href="#其他技术点" class="headerlink" title="其他技术点"></a>其他技术点</h1><h2 id="sklearn-中-make-blobs模块的使用"><a href="#sklearn-中-make-blobs模块的使用" class="headerlink" title="sklearn 中 make_blobs模块的使用"></a>sklearn 中 make_blobs模块的使用</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> make_blobs</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line"></span><br><span class="line">    <span class="comment"># make_blobs函数是为了聚类产生数据集</span></span><br><span class="line">   data, label = make_blobs(n_features=<span class="number">2</span>, n_samples=<span class="number">100</span>, centers=<span class="number">3</span>, random_state=<span class="number">3</span>, cluster_std=[<span class="number">0.8</span>, <span class="number">2</span>, <span class="number">5</span>])</span><br><span class="line">    <span class="comment"># n_features : 设置每个样本有几个特征值，默认值是2</span></span><br><span class="line">    <span class="comment"># n_samples : 取多少个样本数，默认值100</span></span><br><span class="line">    <span class="comment"># centers : 样本中心点有几个，默认值是3</span></span><br><span class="line">    <span class="comment"># random_state : 设置随机数种子，防止每次生成的数据都修改。默认是np.random。</span></span><br><span class="line">    <span class="comment"># cluster_std : 每个类别的方差。默认值是1.0   # shuffle : 洗乱，默认值是True</span></span><br><span class="line">    <span class="comment"># center_box : 中心确认之后的数据边界，默认值（-10.0， 10.0）</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 进行样本绘制    plt.scatter(data[:, 0], data[:, 1], c=label)    plt.show()</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E6%89%BF/density-peaks-clustering-algorithm/20171205105253881" alt="img"></p>
+<h2 id="绘制三维图"><a href="#绘制三维图" class="headerlink" title="绘制三维图"></a>绘制三维图</h2><p>见参考资料绘制三维图</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><em>Reducing the Dimensionality of Data with Neural Networks – G. E. Hinton and R. R. Salakhutdinov</em></p>
+<p><em><a target="_blank" rel="noopener" href="https://www.cnblogs.com/doggod/p/9887944.html">基于密度峰值的聚类(DPCA)</a></em></p>
+<p><em><a target="_blank" rel="noopener" href="https://my.oschina.net/u/4275189/blog/3376534">密度峰值聚类算法MATLAB程序</a></em></p>
+<p><em><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xingshansi/p/6777945.html">python绘制三维图</a></em></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>我这里写的只是一个很简单的一个demo，希望大佬们看个热闹，应该存在着不少理解错误的地方，代码冗余度还很高。因为还没有看关于高维数据的密度峰值聚类，也没使用标记过的数据集，以上数据集都是我自己生成的，所以分类结果也不知道误差是多大。原理应该是没错。以后有机会，会继续完善这部分代码，使用上高维数据，也会用到更加真实的数据集进行测试。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      <div style="display: inline-block;">
+        <img src="/images/pay.gif" alt="Bo ‎">
+        <p>‎</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Density-Peaks-Clustering/" rel="tag"># Density Peaks Clustering</a>
+              <a href="/tags/Algorithm/" rel="tag"># Algorithm</a>
+          </div>
+
+        
+
+
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1%E3%80%81%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">1、背景介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2%E3%80%81%E5%B1%80%E9%83%A8%E5%AF%86%E5%BA%A6"><span class="nav-number">2.</span> <span class="nav-text">2、局部密度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3%E3%80%81%E5%AE%9A%E4%B9%89%E8%81%9A%E7%B1%BB%E4%B8%AD%E5%BF%83%E8%B7%9D%E7%A6%BB"><span class="nav-number">3.</span> <span class="nav-text">3、定义聚类中心距离</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4%E3%80%81%E8%81%9A%E7%B1%BB%E6%95%88%E6%9E%9C"><span class="nav-number">4.</span> <span class="nav-text">4、聚类效果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5%E3%80%81%E4%BB%A3%E7%A0%81"><span class="nav-number">5.</span> <span class="nav-text">5、代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%E3%80%81%E8%AE%A1%E7%AE%97%E8%B7%9D%E7%A6%BB%E7%9F%A9%E9%98%B5"><span class="nav-number">5.1.</span> <span class="nav-text">1、计算距离矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%E3%80%81%E8%AE%A1%E7%AE%97%E5%AF%86%E5%BA%A6%E6%95%B0%E7%BB%84"><span class="nav-number">5.2.</span> <span class="nav-text">2、计算密度数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3%E3%80%81%E8%AE%A1%E7%AE%97%E5%AF%86%E5%BA%A6%E6%9C%80%E5%A4%A7%E7%9A%84%E7%82%B9%E7%9A%84%E8%81%9A%E7%B1%BB%E4%B8%AD%E5%BF%83%E8%B7%9D%E7%A6%BB"><span class="nav-number">5.3.</span> <span class="nav-text">3、计算密度最大的点的聚类中心距离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4%E3%80%81%E5%88%B0%E7%82%B9%E5%AF%86%E5%BA%A6%E5%A4%A7%E4%BA%8E%E8%87%AA%E8%BA%AB%E6%9C%80%E8%BF%91%E7%82%B9%E7%9A%84%E8%B7%9D%E7%A6%BB"><span class="nav-number">5.4.</span> <span class="nav-text">4、到点密度大于自身最近点的距离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5%E3%80%81%E8%AE%A1%E7%AE%97%E5%90%84%E7%82%B9%E5%88%B0%E8%81%9A%E7%B1%BB%E4%B8%AD%E5%BF%83%E7%9A%84%E8%B7%9D%E7%A6%BB"><span class="nav-number">5.5.</span> <span class="nav-text">5、计算各点到聚类中心的距离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6%E3%80%81%E6%A0%B9%E6%8D%AE%E7%89%B9%E5%BE%81%E5%88%86%E7%B1%BB"><span class="nav-number">5.6.</span> <span class="nav-text">6、根据特征分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7%E3%80%81%E8%BE%93%E5%87%BA%E6%AF%8F%E4%B8%AA%E7%82%B9%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">5.7.</span> <span class="nav-text">7、输出每个点的分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8%E3%80%81%E8%AE%A1%E7%AE%97%E6%9C%80%E5%A4%A7%E6%9C%80%E5%B0%8F%E8%B7%9D%E7%A6%BB"><span class="nav-number">5.8.</span> <span class="nav-text">8、计算最大最小距离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%90%E4%BB%A3%E7%A0%81"><span class="nav-number">5.9.</span> <span class="nav-text">源代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86%E5%AE%9E%E4%BE%8B"><span class="nav-number">5.10.</span> <span class="nav-text">数据集实例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%8A%80%E6%9C%AF%E7%82%B9"><span class="nav-number">6.</span> <span class="nav-text">其他技术点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#sklearn-%E4%B8%AD-make-blobs%E6%A8%A1%E5%9D%97%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">6.1.</span> <span class="nav-text">sklearn 中 make_blobs模块的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%98%E5%88%B6%E4%B8%89%E7%BB%B4%E5%9B%BE"><span class="nav-number">6.2.</span> <span class="nav-text">绘制三维图</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <a href = "/about/">
+    <img class="site-author-image" itemprop="image" alt="Bo"
+      src="/images/avatar.jpg">
+    </a>
+  <p class="site-author-name" itemprop="name">Bo</p>
+  <div class="site-description" itemprop="description">I can do all things through Christ who strengthens me!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/GH4Bo" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;GH4Bo" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:kidsskiss@gmail.com" title="E-Mail → mailto:kidsskiss@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://z2bns.github.io/" title="https:&#x2F;&#x2F;z2bns.github.io&#x2F;" rel="noopener" target="_blank">点击访问大神博客</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 1997 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="far fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bo</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/gh/HCLonely/Valine@latest/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : 'xvPpIC0fTJw0SCzjTX3RDtjT-gzGzoHsz',
+      appKey     : 'GcGmxlL5sRKzOL7wPQUDeCcm',
+      placeholder: "请多多指教。。。",
+      avatar     : 'monsterid',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":300,"height":600,"position":"left","hOffset":0,"vOffset":-100},"mobile":{"show":false,"scale":0.05},"react":{"opacityDefault":0.7,"opacityOnHover":0.2}});</script></body>
+</html>

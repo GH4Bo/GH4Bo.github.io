@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Press Start 2P:300,300italic,400,400italic,700,700italic|Noto Serif SC:300,300italic,400,400italic,700,700italic|ZCOOL XiaoWei:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-minimal.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"gh4bo.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本文记录学习深度学习过程，记录一些重点和难理解的方面吧，非总结向，可能不是很全面。   参考书目《Deep Learning》–Ian Goodfellow">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Deep Learning">
+<meta property="og:url" content="http://gh4bo.github.io/%E6%89%BF/deepLearning/index.html">
+<meta property="og:site_name" content="Bo">
+<meta property="og:description" content="本文记录学习深度学习过程，记录一些重点和难理解的方面吧，非总结向，可能不是很全面。   参考书目《Deep Learning》–Ian Goodfellow">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/deepLearning/b25882a053184cc3beeebca76f4f6a7f.jpg">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/deepLearning/7ac0fec8d1b84cd6873eea6e187daba1_th.jpg">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/deepLearning/c0d866fbcec14ef8b7d0744ea19d9e4a_th.jpg">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/deepLearning/e128986957d842f1bee4ef6bc5040723_th.jpg">
+<meta property="og:image" content="http://gh4bo.github.io/%E6%89%BF/deepLearning/20180827170344271">
+<meta property="article:published_time" content="2021-04-13T13:09:26.000Z">
+<meta property="article:modified_time" content="2021-04-16T07:55:11.197Z">
+<meta property="article:author" content="Bo">
+<meta property="article:tag" content="Deep Learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gh4bo.github.io/%E6%89%BF/deepLearning/b25882a053184cc3beeebca76f4f6a7f.jpg">
+
+<link rel="canonical" href="http://gh4bo.github.io/%E6%89%BF/deepLearning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Deep Learning | Bo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Bo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">14</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">14</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/GH4Bo" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://gh4bo.github.io/%E6%89%BF/deepLearning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Bo">
+      <meta itemprop="description" content="I can do all things through Christ who strengthens me!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Deep Learning
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-13 21:09:26" itemprop="dateCreated datePublished" datetime="2021-04-13T21:09:26+08:00">2021-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-16 15:55:11" itemprop="dateModified" datetime="2021-04-16T15:55:11+08:00">2021-04-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%89%BF/" itemprop="url" rel="index"><span itemprop="name">承</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E6%89%BF/deepLearning/" class="post-meta-item leancloud_visitors" data-flag-title="Deep Learning" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E6%89%BF/deepLearning/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E6%89%BF/deepLearning/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>  本文记录学习深度学习过程，记录一些重点和难理解的方面吧，非总结向，可能不是很全面。</p>
+<p>  <strong>参考书目《Deep Learning》–Ian Goodfellow</strong></p>
+<span id="more"></span>
+
+<p>[TOC]</p>
+<h2 id="第1章-引言"><a href="#第1章-引言" class="headerlink" title="第1章 引言"></a>第1章 引言</h2><h3 id="1-1-本书面向的读者"><a href="#1-1-本书面向的读者" class="headerlink" title="1.1 本书面向的读者"></a>1.1 本书面向的读者</h3><h3 id="1-2-深度学习的历史趋势"><a href="#1-2-深度学习的历史趋势" class="headerlink" title="1.2 深度学习的历史趋势"></a>1.2 深度学习的历史趋势</h3><h1 id="第1部分-应用数学与机器学习基础"><a href="#第1部分-应用数学与机器学习基础" class="headerlink" title="第1部分 应用数学与机器学习基础"></a>第1部分 应用数学与机器学习基础</h1><h2 id="第2章-线性代数"><a href="#第2章-线性代数" class="headerlink" title="第2章 线性代数"></a>第2章 线性代数</h2><h3 id="2-1-标量、向量、矩阵和张量"><a href="#2-1-标量、向量、矩阵和张量" class="headerlink" title="2.1 标量、向量、矩阵和张量"></a>2.1 标量、向量、矩阵和张量</h3><p>这一部分第一次接触，看起来很像是之前数学、物理中学过的概念，但是琢磨一下还是发现概念很绕的，总是似懂非懂，脑子转不过弯，网上看了很多介绍，千篇一律，都只是讲概念。</p>
+<p>Youtube上有一段Dan Fleisch讲解张量的一段视频，是人们非常推荐的。</p>
+<p><em><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=f5liqUk0ZTw">What’s a Tensor?</a></em></p>
+<p>可能因为我脑子笨吧，看了这么生动的讲解还是没有了解。所以又找了一些资料，看看是否有更通俗的理解。</p>
+<p>张量就是一个变化量。</p>
+<p>张量有零阶、一阶、二阶、三阶、四阶等等。</p>
+<p>零阶张量是标量（数值）</p>
+<p>一阶张量是向量（数值和方向的组合）</p>
+<p>二阶张量是矩阵（向量的组合）</p>
+<p>三阶张量是数据立体（矩阵的组合）</p>
+<p>四阶张量（数据立体的组合）</p>
+<p>等等。</p>
+<p>1、标量就是一个数值，可以看成是一个数值上的变化量。</p>
+<p>2、向量是点到点的变化量，而点可以是一维空间上的点、二维空间上的点、三维空间上的点，等等。</p>
+<p>一维空间上的点的变化，好像点(x)在线上的移动，也即是左右的线性变化，变化量可以表示为[x1]。</p>
+<p>二维空间上的点的变化，好像点(x,y)在面上的移动，也即是前后左右的线性变化，变化量可以表示为[x1, y1]。</p>
+<p>三维空间上的点的变化，好像点(x,y,z)在体上的移动，也即是前后上下左右的线性变化，变化量可以表示为[x1, y1, z1]。</p>
+<p>N维空间上的点的变化，好像点(x,y,z,…..n)在体上的移动，也即是2n个方向的线性变化，变化量可以表示为[x1, y1, z1,……n1]。</p>
+<p>3、矩阵是图形到图形的变化量，而图形可以是一维的线、二维的面、三维的体，等等。</p>
+<p>3.1、一维的线的变化，我们知道两点可以表示一线段，则需要用两个向量组成的矩阵对两点进行变化，就能达到对线段的变化。</p>
+<p><img src="/%E6%89%BF/deepLearning/b25882a053184cc3beeebca76f4f6a7f.jpg" alt="img"></p>
+<p>3.2、二维的面的变化，我们知道三点可以表示一个三角形，四点可以表示一个四边形，五点可以表示一个五边形，等等。就拿三角形来说，需要用三个向量组成的矩阵对三点进行变化，就能达到对三角形的变化。</p>
+<p><img src="/%E6%89%BF/deepLearning/7ac0fec8d1b84cd6873eea6e187daba1_th.jpg" alt="img"></p>
+<p>3.3、三维的体的变化，我们知道4点可以表示一个三角堆，5点可以表示四棱锥、6点可以表示一个三棱柱，等等。就拿三角堆来说，需要用四个向量组成的矩阵来对四个顶点进行变化，就能达到对三角堆的变化。</p>
+<p><img src="/%E6%89%BF/deepLearning/c0d866fbcec14ef8b7d0744ea19d9e4a_th.jpg" alt="img"></p>
+<p>4、三阶张量可以表示图像的变化量，图像与图形的不同是图像的点除了有坐标，还具有颜色特性，如RGB、RGBA、YCbcr等表示的颜色。拿RGB的图像来说，它的变化量包括坐标和色值变化。图像坐标的变化相当于图形的变化，即是一个矩阵的变化。色值变化也就是RGB在颜色空间中的一个点变化，也是一个矩阵的变化，图像变化有两个矩阵变化，三阶张量是矩阵的组合，则可以用三阶张量来表示图像的变化量，如tensor[3,5,5]表示3颜色通道的5*5大小图形的变化量。</p>
+<p>5、四阶张量在TensorFlow的神经卷积网络中，经常用到。下面举个例子。</p>
+<p>5.1、输入张量格式：[batch, in_height, in_width, in_channels]</p>
+<p>5.2、卷积核格式：[filter_height, filter_width, in_channels, out_channels]</p>
+<p>5.3、我们来对输入图片进行卷积得到特征图片。</p>
+<p>一张5通道的5*5的输入图片：input = [1, 5, 5, 5];</p>
+<p>5输入通道、7输出通道的3*3大小的卷积核：filter = [3, 3, 5, 7];</p>
+<p>strides=[1,1,1,1]表示各个方向步长为1；</p>
+<p>padding=“SAME”表示卷积核遍历到输入图片的每个像素，得到的特征图片与输入图片是一样大小。</p>
+<p>tf.shape(tf.nn.conv2d(input, filter, strides=[1,1,1,1], padding=“SAME”));</p>
+<p>卷积结果是：[1, 5, 5, 7]</p>
+<p>5.4、用图形来表示上面的卷积过程。</p>
+<p><img src="/%E6%89%BF/deepLearning/e128986957d842f1bee4ef6bc5040723_th.jpg" alt="img"></p>
+<p><strong>简化版：</strong></p>
+<p>标量，向量，矩阵与张量</p>
+<p>1、标量<br>一个标量就是一个单独的数，一般用小写的的变量名称表示。</p>
+<p>2、向量<br>一个向量就是一列数，这些数是有序排列的。用过次序中的索引，我们可以确定每个单独的数。通常会赋予向量粗体的小写名称。当我们需要明确表示向量中的元素时，我们会将元素排列成一个方括号包围的纵柱：</p>
+<p>我们可以把向量看作空间中的点，每个元素是不同的坐标轴上的坐标。</p>
+<p>$$<br>x=[x_1\ x_2\ \cdots\ x_n]<br>$$<br>3、矩阵<br>矩阵是二维数组，其中的每一个元素被两个索引而非一个所确定。我们通常会赋予矩阵粗体的大写变量名称，比如A。 如果一个实数矩阵高度为m，宽度为n，那么我们说 。<br>$$<br>A=<br>\begin{bmatrix}<br>    a_{11} &amp; a_{12} &amp; \cdots &amp; a_{1n} \<br>    a_{21} &amp; a_{22} &amp; \cdots &amp; a_{2n} \<br>    a_{31} &amp; a_{32} &amp; \cdots &amp; a_{3n} \<br>    \cdots &amp; \cdots &amp;        &amp; \cdots \<br>    a_{m1} &amp; a_{n2} &amp; \cdots &amp; a_{mn} \<br>\end{bmatrix}<br>$$<br>矩阵这东西在机器学习中就不要太重要了！实际上，如果我们现在有N个用户的数据，每条数据含有M个特征，那其实它对应的就是一个N<em>M的矩阵呀；再比如，一张图由16</em>16的像素点组成，那这就是一个16*16的矩阵了。现在才发现，我们大一学的矩阵原理原来这么的有用！要是当时老师讲课的时候先普及一下，也不至于很多同学学矩阵的时候觉得莫名其妙了。</p>
+<p><img src="/%E6%89%BF/deepLearning/20180827170344271" alt="img"></p>
+<p>4、张量<br>几何代数中定义的张量是基于向量和矩阵的推广，通俗一点理解的话，我们可以将标量视为零阶张量，矢量视为一阶张量，那么矩阵就是二阶张量。</p>
+<p>例如，可以将任意一张彩色图片表示成一个三阶张量，三个维度分别是图片的高度、宽度和色彩数据。将这张图用张量表示出来，就是最下方的那张表格：</p>
+<p>其中表的横轴表示图片的宽度值，这里只截取0<del>319；表的纵轴表示图片的高度值，这里只截取0</del>4；表格中每个方格代表一个像素点，比如第一行第一列的表格数据为[1.0,1.0,1.0]，代表的就是RGB三原色在图片的这个位置的取值情况（即R=1.0，G=1.0，B=1.0）。</p>
+<p>当然我们还可以将这一定义继续扩展，即：我们可以用四阶张量表示一个包含多张图片的数据集，这四个维度分别是：图片在数据集中的编号，图片高度、宽度，以及色彩数据。</p>
+<p><strong>还有一种描述</strong></p>
+<ul>
+<li>(2,3) 表示两个一维数组,每个一维数组长度为3</li>
+<li>(2,3,4) 表示两个二维数组,每个二维数组有3个一维数组,每个一维数组长度为4</li>
+<li>(2,3,4,5) 表示两个三维数组,每个三维数组有3个二维数组,每个二维数组有4个一维数组,一维数组长度为5</li>
+</ul>
+<p>可能更容易理解。</p>
+<h3 id="2-2-矩阵和向量相乘"><a href="#2-2-矩阵和向量相乘" class="headerlink" title="2.2 矩阵和向量相乘"></a>2.2 矩阵和向量相乘</h3><h3 id="2-3-单位矩阵和逆矩阵"><a href="#2-3-单位矩阵和逆矩阵" class="headerlink" title="2.3 单位矩阵和逆矩阵"></a>2.3 单位矩阵和逆矩阵</h3><h3 id="2-4-线性相关和生成子空间"><a href="#2-4-线性相关和生成子空间" class="headerlink" title="2.4 线性相关和生成子空间"></a>2.4 线性相关和生成子空间</h3><h3 id="2-5-范数"><a href="#2-5-范数" class="headerlink" title="2.5 范数"></a>2.5 范数</h3><h3 id="2-6-特殊类型的矩阵和向量"><a href="#2-6-特殊类型的矩阵和向量" class="headerlink" title="2.6 特殊类型的矩阵和向量"></a>2.6 特殊类型的矩阵和向量</h3><h3 id="2-7-特征分解"><a href="#2-7-特征分解" class="headerlink" title="2.7 特征分解"></a>2.7 特征分解</h3><h3 id="2-8-奇异值分解"><a href="#2-8-奇异值分解" class="headerlink" title="2.8 奇异值分解"></a>2.8 奇异值分解</h3><h3 id="2-9-Moore-Penrose-伪逆"><a href="#2-9-Moore-Penrose-伪逆" class="headerlink" title="2.9 Moore-Penrose 伪逆"></a>2.9 Moore-Penrose 伪逆</h3><h3 id="2-10-迹运算"><a href="#2-10-迹运算" class="headerlink" title="2.10 迹运算"></a>2.10 迹运算</h3><h3 id="2-11-行列式"><a href="#2-11-行列式" class="headerlink" title="2.11 行列式"></a>2.11 行列式</h3><h3 id="2-12-实例：主成分分析"><a href="#2-12-实例：主成分分析" class="headerlink" title="2.12 实例：主成分分析"></a>2.12 实例：主成分分析</h3><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/41120789">如何通俗易懂地讲解什么是 PCA 主成分分析？</a></p>
+<h2 id="第3章-概率与信息论"><a href="#第3章-概率与信息论" class="headerlink" title="第3章 概率与信息论"></a>第3章 概率与信息论</h2><h3 id="3-1-为什么要使用概率"><a href="#3-1-为什么要使用概率" class="headerlink" title="3.1 为什么要使用概率"></a>3.1 为什么要使用概率</h3><h3 id="3-2-随机变量"><a href="#3-2-随机变量" class="headerlink" title="3.2 随机变量"></a>3.2 随机变量</h3><h3 id="3-3-概率分布"><a href="#3-3-概率分布" class="headerlink" title="3.3 概率分布"></a>3.3 概率分布</h3><h3 id="3-4-边缘概率"><a href="#3-4-边缘概率" class="headerlink" title="3.4 边缘概率"></a>3.4 边缘概率</h3><h3 id="3-5-条件概率"><a href="#3-5-条件概率" class="headerlink" title="3.5 条件概率"></a>3.5 条件概率</h3><h3 id="3-6-条件概率的链式法则"><a href="#3-6-条件概率的链式法则" class="headerlink" title="3.6 条件概率的链式法则"></a>3.6 条件概率的链式法则</h3><h3 id="3-7-独立性和条件独立性"><a href="#3-7-独立性和条件独立性" class="headerlink" title="3.7 独立性和条件独立性"></a>3.7 独立性和条件独立性</h3><h3 id="3-8-期望、方差和协方差"><a href="#3-8-期望、方差和协方差" class="headerlink" title="3.8 期望、方差和协方差"></a>3.8 期望、方差和协方差</h3><h3 id="3-9-常用概率分布"><a href="#3-9-常用概率分布" class="headerlink" title="3.9 常用概率分布"></a>3.9 常用概率分布</h3><h3 id="3-10-常用函数的有用性质"><a href="#3-10-常用函数的有用性质" class="headerlink" title="3.10 常用函数的有用性质"></a>3.10 常用函数的有用性质</h3><h3 id="3-11-贝叶斯规则"><a href="#3-11-贝叶斯规则" class="headerlink" title="3.11 贝叶斯规则"></a>3.11 贝叶斯规则</h3><h3 id="3-12-连续型变量的技术细节"><a href="#3-12-连续型变量的技术细节" class="headerlink" title="3.12 连续型变量的技术细节"></a>3.12 连续型变量的技术细节</h3><h3 id="3-13-信息论"><a href="#3-13-信息论" class="headerlink" title="3.13 信息论"></a>3.13 信息论</h3><h3 id="3-14-结构化概率模型"><a href="#3-14-结构化概率模型" class="headerlink" title="3.14 结构化概率模型"></a>3.14 结构化概率模型</h3><h2 id="第4章-数值计算"><a href="#第4章-数值计算" class="headerlink" title="第4章 数值计算"></a>第4章 数值计算</h2><h3 id="4-1-上溢和下溢"><a href="#4-1-上溢和下溢" class="headerlink" title="4.1 上溢和下溢"></a>4.1 上溢和下溢</h3><h3 id="4-2-病态条件"><a href="#4-2-病态条件" class="headerlink" title="4.2 病态条件"></a>4.2 病态条件</h3><h3 id="4-3-基于梯度的优化方法"><a href="#4-3-基于梯度的优化方法" class="headerlink" title="4.3 基于梯度的优化方法"></a>4.3 基于梯度的优化方法</h3><h3 id="4-4-约束优化"><a href="#4-4-约束优化" class="headerlink" title="4.4 约束优化"></a>4.4 约束优化</h3><h3 id="4-5-实例：线性最小二乘"><a href="#4-5-实例：线性最小二乘" class="headerlink" title="4.5 实例：线性最小二乘"></a>4.5 实例：线性最小二乘</h3><h2 id="第5章-机器学习基础"><a href="#第5章-机器学习基础" class="headerlink" title="第5章 机器学习基础"></a>第5章 机器学习基础</h2><h3 id="5-1-学习算法"><a href="#5-1-学习算法" class="headerlink" title="5.1 学习算法"></a>5.1 学习算法</h3><h3 id="5-2-容量、过拟合和欠拟合"><a href="#5-2-容量、过拟合和欠拟合" class="headerlink" title="5.2 容量、过拟合和欠拟合"></a>5.2 容量、过拟合和欠拟合</h3><h3 id="5-3-超参数和验证集"><a href="#5-3-超参数和验证集" class="headerlink" title="5.3 超参数和验证集"></a>5.3 超参数和验证集</h3><h3 id="5-4-估计、偏差和方差"><a href="#5-4-估计、偏差和方差" class="headerlink" title="5.4 估计、偏差和方差"></a>5.4 估计、偏差和方差</h3><h3 id="5-5-最大似然估计"><a href="#5-5-最大似然估计" class="headerlink" title="5.5 最大似然估计"></a>5.5 最大似然估计</h3><h3 id="5-6-贝叶斯统计"><a href="#5-6-贝叶斯统计" class="headerlink" title="5.6 贝叶斯统计"></a>5.6 贝叶斯统计</h3><h3 id="5-7-监督学习算法"><a href="#5-7-监督学习算法" class="headerlink" title="5.7 监督学习算法"></a>5.7 监督学习算法</h3><h3 id="5-8-无监督学习算法"><a href="#5-8-无监督学习算法" class="headerlink" title="5.8 无监督学习算法"></a>5.8 无监督学习算法</h3><h3 id="5-9-随机梯度下降"><a href="#5-9-随机梯度下降" class="headerlink" title="5.9 随机梯度下降"></a>5.9 随机梯度下降</h3><h3 id="5-10-构建机器学习算法"><a href="#5-10-构建机器学习算法" class="headerlink" title="5.10 构建机器学习算法"></a>5.10 构建机器学习算法</h3><h3 id="5-11-促使深度学习发展的挑战"><a href="#5-11-促使深度学习发展的挑战" class="headerlink" title="5.11 促使深度学习发展的挑战"></a>5.11 促使深度学习发展的挑战</h3><h1 id="第2部分-深度网络：现代实践"><a href="#第2部分-深度网络：现代实践" class="headerlink" title="第2部分 深度网络：现代实践"></a>第2部分 深度网络：现代实践</h1><h2 id="第6章-深度前馈网络"><a href="#第6章-深度前馈网络" class="headerlink" title="第6章 深度前馈网络"></a>第6章 深度前馈网络</h2><h3 id="6-1-实例：学习XOR"><a href="#6-1-实例：学习XOR" class="headerlink" title="6.1 实例：学习XOR"></a>6.1 实例：学习XOR</h3>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      <div style="display: inline-block;">
+        <img src="/images/pay.gif" alt="Bo ‎">
+        <p>‎</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Deep-Learning/" rel="tag"># Deep Learning</a>
+          </div>
+
+        
+
+
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC1%E7%AB%A0-%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">第1章 引言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%9C%AC%E4%B9%A6%E9%9D%A2%E5%90%91%E7%9A%84%E8%AF%BB%E8%80%85"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 本书面向的读者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%8E%86%E5%8F%B2%E8%B6%8B%E5%8A%BF"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 深度学习的历史趋势</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC1%E9%83%A8%E5%88%86-%E5%BA%94%E7%94%A8%E6%95%B0%E5%AD%A6%E4%B8%8E%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80"><span class="nav-number"></span> <span class="nav-text">第1部分 应用数学与机器学习基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC2%E7%AB%A0-%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">第2章 线性代数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%A0%87%E9%87%8F%E3%80%81%E5%90%91%E9%87%8F%E3%80%81%E7%9F%A9%E9%98%B5%E5%92%8C%E5%BC%A0%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">2.1 标量、向量、矩阵和张量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%9F%A9%E9%98%B5%E5%92%8C%E5%90%91%E9%87%8F%E7%9B%B8%E4%B9%98"><span class="nav-number">1.2.</span> <span class="nav-text">2.2 矩阵和向量相乘</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%8D%95%E4%BD%8D%E7%9F%A9%E9%98%B5%E5%92%8C%E9%80%86%E7%9F%A9%E9%98%B5"><span class="nav-number">1.3.</span> <span class="nav-text">2.3 单位矩阵和逆矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E7%BA%BF%E6%80%A7%E7%9B%B8%E5%85%B3%E5%92%8C%E7%94%9F%E6%88%90%E5%AD%90%E7%A9%BA%E9%97%B4"><span class="nav-number">1.4.</span> <span class="nav-text">2.4 线性相关和生成子空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E8%8C%83%E6%95%B0"><span class="nav-number">1.5.</span> <span class="nav-text">2.5 范数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-%E7%89%B9%E6%AE%8A%E7%B1%BB%E5%9E%8B%E7%9A%84%E7%9F%A9%E9%98%B5%E5%92%8C%E5%90%91%E9%87%8F"><span class="nav-number">1.6.</span> <span class="nav-text">2.6 特殊类型的矩阵和向量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-%E7%89%B9%E5%BE%81%E5%88%86%E8%A7%A3"><span class="nav-number">1.7.</span> <span class="nav-text">2.7 特征分解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-8-%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3"><span class="nav-number">1.8.</span> <span class="nav-text">2.8 奇异值分解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-9-Moore-Penrose-%E4%BC%AA%E9%80%86"><span class="nav-number">1.9.</span> <span class="nav-text">2.9 Moore-Penrose 伪逆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-10-%E8%BF%B9%E8%BF%90%E7%AE%97"><span class="nav-number">1.10.</span> <span class="nav-text">2.10 迹运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-11-%E8%A1%8C%E5%88%97%E5%BC%8F"><span class="nav-number">1.11.</span> <span class="nav-text">2.11 行列式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-12-%E5%AE%9E%E4%BE%8B%EF%BC%9A%E4%B8%BB%E6%88%90%E5%88%86%E5%88%86%E6%9E%90"><span class="nav-number">1.12.</span> <span class="nav-text">2.12 实例：主成分分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC3%E7%AB%A0-%E6%A6%82%E7%8E%87%E4%B8%8E%E4%BF%A1%E6%81%AF%E8%AE%BA"><span class="nav-number">2.</span> <span class="nav-text">第3章 概率与信息论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8%E6%A6%82%E7%8E%87"><span class="nav-number">2.1.</span> <span class="nav-text">3.1 为什么要使用概率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F"><span class="nav-number">2.2.</span> <span class="nav-text">3.2 随机变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83"><span class="nav-number">2.3.</span> <span class="nav-text">3.3 概率分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E8%BE%B9%E7%BC%98%E6%A6%82%E7%8E%87"><span class="nav-number">2.4.</span> <span class="nav-text">3.4 边缘概率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E6%9D%A1%E4%BB%B6%E6%A6%82%E7%8E%87"><span class="nav-number">2.5.</span> <span class="nav-text">3.5 条件概率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E6%9D%A1%E4%BB%B6%E6%A6%82%E7%8E%87%E7%9A%84%E9%93%BE%E5%BC%8F%E6%B3%95%E5%88%99"><span class="nav-number">2.6.</span> <span class="nav-text">3.6 条件概率的链式法则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-%E7%8B%AC%E7%AB%8B%E6%80%A7%E5%92%8C%E6%9D%A1%E4%BB%B6%E7%8B%AC%E7%AB%8B%E6%80%A7"><span class="nav-number">2.7.</span> <span class="nav-text">3.7 独立性和条件独立性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-%E6%9C%9F%E6%9C%9B%E3%80%81%E6%96%B9%E5%B7%AE%E5%92%8C%E5%8D%8F%E6%96%B9%E5%B7%AE"><span class="nav-number">2.8.</span> <span class="nav-text">3.8 期望、方差和协方差</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-%E5%B8%B8%E7%94%A8%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83"><span class="nav-number">2.9.</span> <span class="nav-text">3.9 常用概率分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-10-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E7%9A%84%E6%9C%89%E7%94%A8%E6%80%A7%E8%B4%A8"><span class="nav-number">2.10.</span> <span class="nav-text">3.10 常用函数的有用性质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-11-%E8%B4%9D%E5%8F%B6%E6%96%AF%E8%A7%84%E5%88%99"><span class="nav-number">2.11.</span> <span class="nav-text">3.11 贝叶斯规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-12-%E8%BF%9E%E7%BB%AD%E5%9E%8B%E5%8F%98%E9%87%8F%E7%9A%84%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82"><span class="nav-number">2.12.</span> <span class="nav-text">3.12 连续型变量的技术细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-13-%E4%BF%A1%E6%81%AF%E8%AE%BA"><span class="nav-number">2.13.</span> <span class="nav-text">3.13 信息论</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-14-%E7%BB%93%E6%9E%84%E5%8C%96%E6%A6%82%E7%8E%87%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.14.</span> <span class="nav-text">3.14 结构化概率模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC4%E7%AB%A0-%E6%95%B0%E5%80%BC%E8%AE%A1%E7%AE%97"><span class="nav-number">3.</span> <span class="nav-text">第4章 数值计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E4%B8%8A%E6%BA%A2%E5%92%8C%E4%B8%8B%E6%BA%A2"><span class="nav-number">3.1.</span> <span class="nav-text">4.1 上溢和下溢</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E7%97%85%E6%80%81%E6%9D%A1%E4%BB%B6"><span class="nav-number">3.2.</span> <span class="nav-text">4.2 病态条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E5%9F%BA%E4%BA%8E%E6%A2%AF%E5%BA%A6%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95"><span class="nav-number">3.3.</span> <span class="nav-text">4.3 基于梯度的优化方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E7%BA%A6%E6%9D%9F%E4%BC%98%E5%8C%96"><span class="nav-number">3.4.</span> <span class="nav-text">4.4 约束优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-%E5%AE%9E%E4%BE%8B%EF%BC%9A%E7%BA%BF%E6%80%A7%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98"><span class="nav-number">3.5.</span> <span class="nav-text">4.5 实例：线性最小二乘</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC5%E7%AB%A0-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80"><span class="nav-number">4.</span> <span class="nav-text">第5章 机器学习基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95"><span class="nav-number">4.1.</span> <span class="nav-text">5.1 学习算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E5%AE%B9%E9%87%8F%E3%80%81%E8%BF%87%E6%8B%9F%E5%90%88%E5%92%8C%E6%AC%A0%E6%8B%9F%E5%90%88"><span class="nav-number">4.2.</span> <span class="nav-text">5.2 容量、过拟合和欠拟合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E8%B6%85%E5%8F%82%E6%95%B0%E5%92%8C%E9%AA%8C%E8%AF%81%E9%9B%86"><span class="nav-number">4.3.</span> <span class="nav-text">5.3 超参数和验证集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-%E4%BC%B0%E8%AE%A1%E3%80%81%E5%81%8F%E5%B7%AE%E5%92%8C%E6%96%B9%E5%B7%AE"><span class="nav-number">4.4.</span> <span class="nav-text">5.4 估计、偏差和方差</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-5-%E6%9C%80%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1"><span class="nav-number">4.5.</span> <span class="nav-text">5.5 最大似然估计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-6-%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BB%9F%E8%AE%A1"><span class="nav-number">4.6.</span> <span class="nav-text">5.6 贝叶斯统计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-7-%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95"><span class="nav-number">4.7.</span> <span class="nav-text">5.7 监督学习算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-8-%E6%97%A0%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95"><span class="nav-number">4.8.</span> <span class="nav-text">5.8 无监督学习算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-9-%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="nav-number">4.9.</span> <span class="nav-text">5.9 随机梯度下降</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-10-%E6%9E%84%E5%BB%BA%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95"><span class="nav-number">4.10.</span> <span class="nav-text">5.10 构建机器学习算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-11-%E4%BF%83%E4%BD%BF%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%8F%91%E5%B1%95%E7%9A%84%E6%8C%91%E6%88%98"><span class="nav-number">4.11.</span> <span class="nav-text">5.11 促使深度学习发展的挑战</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC2%E9%83%A8%E5%88%86-%E6%B7%B1%E5%BA%A6%E7%BD%91%E7%BB%9C%EF%BC%9A%E7%8E%B0%E4%BB%A3%E5%AE%9E%E8%B7%B5"><span class="nav-number"></span> <span class="nav-text">第2部分 深度网络：现代实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC6%E7%AB%A0-%E6%B7%B1%E5%BA%A6%E5%89%8D%E9%A6%88%E7%BD%91%E7%BB%9C"><span class="nav-number">1.</span> <span class="nav-text">第6章 深度前馈网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%AD%A6%E4%B9%A0XOR"><span class="nav-number">1.1.</span> <span class="nav-text">6.1 实例：学习XOR</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <a href = "/about/">
+    <img class="site-author-image" itemprop="image" alt="Bo"
+      src="/images/avatar.jpg">
+    </a>
+  <p class="site-author-name" itemprop="name">Bo</p>
+  <div class="site-description" itemprop="description">I can do all things through Christ who strengthens me!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/GH4Bo" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;GH4Bo" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:kidsskiss@gmail.com" title="E-Mail → mailto:kidsskiss@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://z2bns.github.io/" title="https:&#x2F;&#x2F;z2bns.github.io&#x2F;" rel="noopener" target="_blank">点击访问大神博客</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 1997 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="far fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bo</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/gh/HCLonely/Valine@latest/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : 'xvPpIC0fTJw0SCzjTX3RDtjT-gzGzoHsz',
+      appKey     : 'GcGmxlL5sRKzOL7wPQUDeCcm',
+      placeholder: "请多多指教。。。",
+      avatar     : 'monsterid',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":300,"height":600,"position":"left","hOffset":0,"vOffset":-100},"mobile":{"show":false,"scale":0.05},"react":{"opacityDefault":0.7,"opacityOnHover":0.2}});</script></body>
+</html>
